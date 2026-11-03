@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -6,109 +5,101 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bé Vẽ & Tô Màu</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#fff5dc;color:#333;text-align:center}
-header{background:#ff8c42;color:white;padding:18px;font-size:25px;font-weight:bold}
-nav{display:flex;justify-content:space-around;background:#fff;padding:12px;position:sticky;top:0}
-button{border:0;border-radius:15px;padding:12px;background:#ffca3a;font-size:16px;font-weight:bold;margin:4px}
-main{padding:15px}
-.palette{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin:15px}
-.color{width:38px;height:38px;border-radius:50%;border:3px solid white;box-shadow:0 1px 4px #aaa}
-svg{background:white;border:4px solid #ffca3a;border-radius:20px;width:100%;max-width:430px;height:340px;touch-action:manipulation}
-path,circle,rect,ellipse{stroke:#333;stroke-width:4;stroke-linejoin:round}
-#gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.card{background:white;padding:15px;border-radius:15px}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff5dc;color:#333;text-align:center}
+header{background:#ff8c42;color:white;padding:16px;font-size:24px;font-weight:bold}
+nav{display:flex;justify-content:space-around;gap:4px;background:#fff;padding:8px;position:sticky;top:0;z-index:2}
+button,select{border:0;border-radius:14px;padding:10px;background:#ffca3a;font-size:15px;font-weight:bold;margin:3px;color:#333}
+main{padding:12px}.palette{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:12px}
+.color{width:36px;height:36px;border-radius:50%;border:3px solid white;box-shadow:0 1px 4px #aaa;padding:0}
+#picture{background:white;border:4px solid #ffca3a;border-radius:18px;width:100%;max-width:430px;height:330px;touch-action:manipulation}
+#picture path,#picture circle,#picture rect,#picture ellipse,#picture polygon{stroke:#333;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+#gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.card{background:white;padding:10px;border-radius:15px;box-shadow:0 2px 5px #0001}
+.thumb{width:100%;height:95px;background:#fff;border-radius:10px}
+.small{font-size:13px;color:#555}.active{background:#ff8c42;color:white}
+#message{min-height:24px}.toolbar{display:flex;justify-content:center;flex-wrap:wrap;gap:4px}
 </style>
 </head>
 <body>
 <header>🎨 Bé Vẽ & Tô Màu 🌈</header>
 <nav>
-<button onclick="show('home')">🏠 Vẽ</button>
-<button onclick="show('gallery')">🖼️ Tranh</button>
+<button onclick="show('home')">🏠 Tô màu</button>
+<button onclick="show('gallery')">🖼️ Thư viện</button>
 <button onclick="show('learn')">✏️ Học vẽ</button>
+<button id="musicBtn" onclick="toggleMusic()">🎵 Bật nhạc</button>
 </nav>
 <main>
 <section id="home">
-<h2>Chọn màu và chạm vào hình nhé!</h2>
+<h3 id="drawingName">Chọn tranh và tô màu nhé!</h3>
+<div class="toolbar">
+<select id="templateSelect" aria-label="Chọn tranh" onchange="loadTemplate(this.value)"></select>
+</div>
 <div class="palette" id="palette"></div>
-<svg id="picture" viewBox="0 0 300 300">
-<circle cx="150" cy="75" r="45" fill="white"/>
-<circle cx="135" cy="65" r="5" fill="#333"/>
-<circle cx="165" cy="65" r="5" fill="#333"/>
-<path d="M130 90 Q150 110 170 90" fill="none"/>
-<path d="M150 120 L150 220 L85 180 L85 250 L215 250 L215 180 Z" fill="white"/>
-<path d="M150 120 L85 180 L215 180 Z" fill="#ffca3a"/>
-<rect x="130" y="185" width="40" height="65" fill="white"/>
-</svg>
-<div>
+<div id="art"></div>
+<div class="toolbar">
 <button onclick="undo()">↩️ Hoàn tác</button>
-<button onclick="clearPicture()">🧽 Xóa màu</button>
+<button onclick="clearPicture()">🧽 Tẩy màu</button>
 <button onclick="savePicture()">💾 Lưu tranh</button>
 </div>
-<p id="message">Bé hãy thử tô màu nhé! ⭐</p>
+<p id="message">Chạm vào từng phần của tranh để tô màu nhé! ⭐</p>
 </section>
 <section id="gallery" hidden>
 <h2>Thư viện tranh</h2>
-<div id="saved"></div>
+<p class="small">Chọn một trong 20 bức tranh để bắt đầu tô màu.</p>
+<div id="galleryGrid"></div>
 </section>
 <section id="learn" hidden>
 <h2>Học vẽ từng bước</h2>
-<div class="card">
-<h3>🏠 Bài 1: Vẽ ngôi nhà</h3>
-<p>1. Vẽ hình vuông làm thân nhà.</p>
-<p>2. Vẽ hình tam giác làm mái.</p>
-<p>3. Vẽ cửa ra vào và cửa sổ.</p>
-<p>4. Tô màu thật đẹp!</p>
-</div>
-<div class="card">
-<h3>🌻 Bài 2: Vẽ bông hoa</h3>
-<p>1. Vẽ một hình tròn ở giữa.</p>
-<p>2. Vẽ các cánh hoa xung quanh.</p>
-<p>3. Vẽ thân và lá.</p>
-<p>4. Tô màu theo ý thích!</p>
-</div>
+<div class="card"><h3>🏠 Ngôi nhà</h3><p>1. Vẽ hình vuông làm thân nhà.</p><p>2. Vẽ mái tam giác.</p><p>3. Thêm cửa, cửa sổ và mặt trời.</p><p>4. Tô màu thật đẹp!</p></div>
+<div class="card"><h3>🌻 Bông hoa</h3><p>1. Vẽ hình tròn ở giữa.</p><p>2. Vẽ cánh hoa xung quanh.</p><p>3. Thêm thân và lá.</p><p>4. Tô màu theo ý thích!</p></div>
+<div class="card"><h3>🐟 Cá nhỏ</h3><p>1. Vẽ thân cá hình bầu dục.</p><p>2. Thêm đuôi và vây.</p><p>3. Vẽ mắt và bong bóng.</p><p>4. Chọn màu đại dương!</p></div>
 </section>
 </main>
 <script>
-let current='#ff595e',history=[];
-const colors=['#ff595e','#ffca3a','#8ac926','#1982c4','#6a4c93','#ff924c','#f15bb5','#00bbf9','#ffffff','#333333'];
+const colors=['#ff595e','#ffca3a','#8ac926','#1982c4','#6a4c93','#ff924c','#f15bb5','#00bbf9','#ffffff','#333333','#bde0fe','#caffbf'];
+let current=colors[0],history=[],audioCtx=null,melodyTimer=null,noteIndex=0;
+const drawings=[
+['Ngôi nhà',`<rect x="65" y="135" width="170" height="125" fill="white"/><polygon points="50,140 150,45 250,140" fill="white"/><rect x="130" y="190" width="42" height="70" fill="white"/><rect x="82" y="160" width="35" height="35" fill="white"/><rect x="185" y="160" width="35" height="35" fill="white"/><circle cx="235" cy="45" r="25" fill="white"/>`],
+['Bông hoa',`<circle cx="150" cy="115" r="28" fill="white"/><circle cx="150" cy="65" r="28" fill="white"/><circle cx="198" cy="100" r="28" fill="white"/><circle cx="180" cy="150" r="28" fill="white"/><circle cx="120" cy="150" r="28" fill="white"/><circle cx="102" cy="100" r="28" fill="white"/><rect x="143" y="170" width="14" height="90" fill="white"/><ellipse cx="112" cy="215" rx="35" ry="15" fill="white"/><ellipse cx="188" cy="230" rx="35" ry="15" fill="white"/>`],
+['Cá nhỏ',`<ellipse cx="140" cy="150" rx="75" ry="48" fill="white"/><polygon points="210,150 270,105 270,195" fill="white"/><polygon points="130,105 165,65 180,115" fill="white"/><circle cx="95" cy="140" r="7" fill="white"/><circle cx="95" cy="140" r="2" fill="#333"/><path d="M120 170 Q145 185 165 165" fill="none"/>`],
+['Con bướm',`<ellipse cx="150" cy="150" rx="12" ry="55" fill="white"/><ellipse cx="95" cy="105" rx="48" ry="42" fill="white"/><ellipse cx="205" cy="105" rx="48" ry="42" fill="white"/><ellipse cx="100" cy="195" rx="38" ry="30" fill="white"/><ellipse cx="200" cy="195" rx="38" ry="30" fill="white"/><path d="M145 95 Q115 35 100 60 M155 95 Q185 35 200 60" fill="none"/>`],
+['Mặt trời',`<circle cx="150" cy="145" r="65" fill="white"/><path d="M150 25 V55 M150 235 V265 M30 145 H60 M240 145 H270 M65 60 L85 80 M215 210 L235 230 M235 60 L215 80 M85 210 L65 230" fill="none" stroke="#333" stroke-width="10"/><circle cx="125" cy="135" r="6" fill="#333"/><circle cx="175" cy="135" r="6" fill="#333"/><path d="M125 170 Q150 195 175 170" fill="none"/>`],
+['Cây táo',`<rect x="135" y="150" width="30" height="110" fill="white"/><circle cx="150" cy="100" r="65" fill="white"/><circle cx="95" cy="125" r="38" fill="white"/><circle cx="205" cy="125" r="38" fill="white"/><circle cx="120" cy="100" r="10" fill="#ff595e"/><circle cx="175" cy="75" r="10" fill="#ff595e"/><circle cx="185" cy="135" r="10" fill="#ff595e"/>`],
+['Tên lửa',`<path d="M150 35 Q220 100 180 220 L120 220 Q80 100 150 35Z" fill="white"/><circle cx="150" cy="120" r="22" fill="white"/><polygon points="120,180 75,230 125,220" fill="white"/><polygon points="180,180 225,230 175,220" fill="white"/><polygon points="135,220 165,220 150,275" fill="white"/>`],
+['Kem ốc quế',`<path d="M95 135 L205 135 L150 270 Z" fill="white"/><circle cx="120" cy="105" r="45" fill="white"/><circle cx="180" cy="105" r="45" fill="white"/><circle cx="150" cy="65" r="43" fill="white"/><path d="M120 165 L180 225 M180 165 L120 225" fill="none"/>`],
+['Ô tô',`<rect x="45" y="135" width="210" height="75" rx="20" fill="white"/><path d="M85 135 L110 85 H190 L220 135Z" fill="white"/><circle cx="95" cy="215" r="25" fill="white"/><circle cx="210" cy="215" r="25" fill="white"/><rect x="120" y="100" width="65" height="32" fill="white"/>`],
+['Con mèo',`<circle cx="150" cy="150" r="75" fill="white"/><polygon points="85,100 75,35 130,80" fill="white"/><polygon points="170,80 225,35 215,105" fill="white"/><circle cx="125" cy="140" r="7" fill="#333"/><circle cx="175" cy="140" r="7" fill="#333"/><polygon points="150,160 140,170 160,170" fill="#ff595e"/><path d="M150 170 V185 M150 185 Q130 200 115 185 M150 185 Q170 200 185 185" fill="none"/>`],
+['Con thỏ',`<circle cx="150" cy="170" r="65" fill="white"/><ellipse cx="115" cy="65" rx="22" ry="65" fill="white"/><ellipse cx="185" cy="65" rx="22" ry="65" fill="white"/><circle cx="125" cy="160" r="6" fill="#333"/><circle cx="175" cy="160" r="6" fill="#333"/><ellipse cx="150" cy="185" rx="12" ry="9" fill="#ff595e"/>`],
+['Ngôi sao',`<polygon points="150,25 180,112 270,112 198,165 225,255 150,200 75,255 102,165 30,112 120,112" fill="white"/>`],
+['Khinh khí cầu',`<ellipse cx="150" cy="105" rx="75" ry="85" fill="white"/><path d="M110 180 L130 220 M190 180 L170 220" fill="none"/><rect x="125" y="220" width="50" height="35" rx="5" fill="white"/><path d="M150 25 V185 M85 100 H215" fill="none"/>`],
+['Con vịt',`<ellipse cx="145" cy="170" rx="85" ry="55" fill="white"/><circle cx="190" cy="95" r="42" fill="white"/><polygon points="225,100 275,115 225,130" fill="white"/><circle cx="200" cy="85" r="6" fill="#333"/><path d="M100 215 L90 250 M155 215 L165 250" fill="none"/>`],
+['Cây nấm',`<path d="M65 145 Q75 45 150 45 Q225 45 235 145Z" fill="white"/><rect x="115" y="145" width="70" height="110" rx="18" fill="white"/><circle cx="115" cy="105" r="13" fill="white"/><circle cx="185" cy="90" r="15" fill="white"/><circle cx="150" cy="65" r="12" fill="white"/>`],
+['Thuyền buồm',`<path d="M45 205 H255 L220 250 H80Z" fill="white"/><path d="M145 45 V200 L70 185Z" fill="white"/><path d="M160 75 L235 185 H160Z" fill="white"/><path d="M35 265 Q75 245 115 265 T195 265 T275 265" fill="none"/>`],
+['Dâu tây',`<path d="M65 100 Q150 55 235 100 Q225 205 150 260 Q75 205 65 100Z" fill="white"/><path d="M150 95 Q120 35 90 65 Q125 65 150 95 Q175 35 210 65 Q175 65 150 95Z" fill="#8ac926"/><circle cx="110" cy="130" r="5" fill="#ffca3a"/><circle cx="160" cy="150" r="5" fill="#ffca3a"/><circle cx="195" cy="125" r="5" fill="#ffca3a"/><circle cx="135" cy="200" r="5" fill="#ffca3a"/>`],
+['Cú mèo',`<ellipse cx="150" cy="155" rx="85" ry="95" fill="white"/><polygon points="85,95 90,30 135,75" fill="white"/><polygon points="165,75 210,30 215,95" fill="white"/><circle cx="120" cy="135" r="27" fill="white"/><circle cx="180" cy="135" r="27" fill="white"/><circle cx="120" cy="135" r="7" fill="#333"/><circle cx="180" cy="135" r="7" fill="#333"/><polygon points="150,155 138,175 162,175" fill="#ffca3a"/>`],
+['Cầu vồng',`<path d="M45 220 A105 105 0 0 1 255 220" fill="none" stroke="#ff595e" stroke-width="28"/><path d="M72 220 A78 78 0 0 1 228 220" fill="none" stroke="#ffca3a" stroke-width="24"/><path d="M96 220 A54 54 0 0 1 204 220" fill="none" stroke="#8ac926" stroke-width="22"/><ellipse cx="55" cy="225" rx="35" ry="22" fill="white"/><ellipse cx="245" cy="225" rx="35" ry="22" fill="white"/>`],
+['Khủng long',`<path d="M65 180 Q65 105 145 105 Q205 105 210 155 L250 175 L215 195 L205 240 H175 L170 205 H115 L105 245 H75 L80 190Z" fill="white"/><circle cx="175" cy="135" r="6" fill="#333"/><polygon points="115,110 130,75 145,110" fill="white"/><polygon points="155,105 170,70 185,110" fill="white"/>`]
+];
+function setSvg(svg){document.getElementById('art').innerHTML='<svg id="picture" viewBox="0 0 300 300">'+svg+'</svg>';document.querySelectorAll('#picture path,#picture circle,#picture rect,#picture ellipse,#picture polygon').forEach(el=>{el.addEventListener('click',()=>{history.push({el,fill:el.getAttribute('fill')});el.setAttribute('fill',current);document.getElementById('message').textContent='Bé tô đẹp quá! ⭐';});});}
+function loadTemplate(i){history=[];document.getElementById('drawingName').textContent=drawings[i][0];setSvg(drawings[i][1]);document.getElementById('templateSelect').value=i;}
 const palette=document.getElementById('palette');
-colors.forEach(c=>{
-let b=document.createElement('button');
-b.className='color';b.style.background=c;
-b.onclick=()=>current=c;palette.appendChild(b);
-});
-document.querySelectorAll('#picture path,#picture circle,#picture rect,#picture ellipse').forEach(el=>{
-el.onclick=()=>{
-history.push({el:el,fill:el.getAttribute('fill')});
-el.setAttribute('fill',current);
-document.getElementById('message').textContent='Giỏi quá! ⭐';
-};
-});
-function undo(){
-let x=history.pop();if(x)x.el.setAttribute('fill',x.fill);
+colors.forEach(c=>{let b=document.createElement('button');b.className='color';b.style.background=c;b.onclick=()=>current=c;palette.appendChild(b);});
+drawings.forEach((d,i)=>{let o=document.createElement('option');o.value=i;o.textContent=d[0];document.getElementById('templateSelect').appendChild(o);});
+function undo(){let x=history.pop();if(x)x.el.setAttribute('fill',x.fill);}
+function clearPicture(){document.querySelectorAll('#picture path,#picture circle,#picture rect,#picture ellipse,#picture polygon').forEach(el=>el.setAttribute('fill','white'));history=[];}
+function savePicture(){let svg=document.getElementById('picture').outerHTML;let list=JSON.parse(localStorage.getItem('drawings')||'[]');list.push({name:document.getElementById('drawingName').textContent,svg});localStorage.setItem('drawings',JSON.stringify(list));alert('Đã lưu tranh của bé!');}
+function show(id){['home','gallery','learn'].forEach(x=>document.getElementById(x).hidden=x!==id);if(id==='gallery'){let list=JSON.parse(localStorage.getItem('drawings')||'[]');document.getElementById('galleryGrid').innerHTML=drawings.map((d,i)=>'<div class="card"><b>'+d[0]+'</b><br><button onclick="openDrawing('+i+')">Tô tranh này</button></div>').join('')+(list.length?'<p class="small">Bé đã lưu '+list.length+' tranh.</p>':'');}}
+function openDrawing(i){show('home');loadTemplate(i);}
+function toggleMusic(){
+ if(melodyTimer){clearInterval(melodyTimer);melodyTimer=null;document.getElementById('musicBtn').textContent='🎵 Bật nhạc';return;}
+ const AudioContext=window.AudioContext||window.webkitAudioContext;
+ if(!AudioContext){alert('Thiết bị chưa hỗ trợ phát nhạc.');return;}
+ audioCtx=audioCtx||new AudioContext();audioCtx.resume();
+ const notes=[523.25,659.25,783.99,659.25,587.33,698.46,783.99,698.46,523.25,587.33,659.25,523.25];
+ function play(){let osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.type='sine';osc.frequency.value=notes[noteIndex++%notes.length];gain.gain.setValueAtTime(0.0001,audioCtx.currentTime);gain.gain.exponentialRampToValueAtTime(0.055,audioCtx.currentTime+0.04);gain.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.28);osc.connect(gain);gain.connect(audioCtx.destination);osc.start();osc.stop(audioCtx.currentTime+0.3);}
+ play();melodyTimer=setInterval(play,340);document.getElementById('musicBtn').textContent='🔇 Tắt nhạc';
 }
-function clearPicture(){
-document.querySelectorAll('#picture path,#picture circle,#picture rect,#picture ellipse').forEach(el=>el.setAttribute('fill','white'));
-history=[];
-}
-function savePicture(){
-let data=new XMLSerializer().serializeToString(document.getElementById('picture'));
-let list=JSON.parse(localStorage.getItem('drawings')||'[]');
-list.push(data);localStorage.setItem('drawings',JSON.stringify(list));
-alert('Đã lưu tranh của bé!');
-}
-function show(id){
-['home','gallery','learn'].forEach(x=>document.getElementById(x).hidden=x!==id);
-if(id==='gallery'){
-let list=JSON.parse(localStorage.getItem('drawings')||'[]');
-document.getElementById('saved').innerHTML=list.map((x,i)=>'<div class="card">Tranh '+(i+1)+'<br><button onclick="view('+i+')">Xem tranh</button></div>').join('');
-}
-}
-function view(i){
-let list=JSON.parse(localStorage.getItem('drawings')||'[]');
-if(list[i]){document.getElementById('picture').outerHTML=list[i].replace('<svg','<svg id="picture"');show('home');}
-}
+loadTemplate(0);
 </script>
 </body>
 </html>
