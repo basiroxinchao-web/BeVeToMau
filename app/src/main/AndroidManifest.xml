@@ -3,7 +3,7 @@
 
     <application
         android:allowBackup="true"
-        android:label="Bé Vẽ &amp; Tô Màu"
+        android:label="Siro tô màu"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:usesCleartextTraffic="false">
 
