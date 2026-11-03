@@ -10,6 +10,7 @@
         android:usesCleartextTraffic="false">
 
         <activity
+            android:screenOrientation="landscape"
             android:name=".MainActivity"
             android:exported="true">
 
