@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bé Vẽ & Tô Màu</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#fff5dc;color:#333;text-align:center}
+header{background:#ff8c42;color:white;padding:18px;font-size:25px;font-weight:bold}
+nav{display:flex;justify-content:space-around;background:#fff;padding:12px;position:sticky;top:0}
+button{border:0;border-radius:15px;padding:12px;background:#ffca3a;font-size:16px;font-weight:bold;margin:4px}
+main{padding:15px}
+.palette{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin:15px}
+.color{width:38px;height:38px;border-radius:50%;border:3px solid white;box-shadow:0 1px 4px #aaa}
+svg{background:white;border:4px solid #ffca3a;border-radius:20px;width:100%;max-width:430px;height:340px;touch-action:manipulation}
+path,circle,rect,ellipse{stroke:#333;stroke-width:4;stroke-linejoin:round}
+#gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:white;padding:15px;border-radius:15px}
+</style>
+</head>
+<body>
+<header>🎨 Bé Vẽ & Tô Màu 🌈</header>
+<nav>
+<button onclick="show('home')">🏠 Vẽ</button>
+<button onclick="show('gallery')">🖼️ Tranh</button>
+<button onclick="show('learn')">✏️ Học vẽ</button>
+</nav>
+<main>
+<section id="home">
+<h2>Chọn màu và chạm vào hình nhé!</h2>
+<div class="palette" id="palette"></div>
+<svg id="picture" viewBox="0 0 300 300">
+<circle cx="150" cy="75" r="45" fill="white"/>
+<circle cx="135" cy="65" r="5" fill="#333"/>
+<circle cx="165" cy="65" r="5" fill="#333"/>
+<path d="M130 90 Q150 110 170 90" fill="none"/>
+<path d="M150 120 L150 220 L85 180 L85 250 L215 250 L215 180 Z" fill="white"/>
+<path d="M150 120 L85 180 L215 180 Z" fill="#ffca3a"/>
+<rect x="130" y="185" width="40" height="65" fill="white"/>
+</svg>
+<div>
+<button onclick="undo()">↩️ Hoàn tác</button>
+<button onclick="clearPicture()">🧽 Xóa màu</button>
+<button onclick="savePicture()">💾 Lưu tranh</button>
+</div>
+<p id="message">Bé hãy thử tô màu nhé! ⭐</p>
+</section>
+<section id="gallery" hidden>
+<h2>Thư viện tranh</h2>
+<div id="saved"></div>
+</section>
+<section id="learn" hidden>
+<h2>Học vẽ từng bước</h2>
+<div class="card">
+<h3>🏠 Bài 1: Vẽ ngôi nhà</h3>
+<p>1. Vẽ hình vuông làm thân nhà.</p>
+<p>2. Vẽ hình tam giác làm mái.</p>
+<p>3. Vẽ cửa ra vào và cửa sổ.</p>
+<p>4. Tô màu thật đẹp!</p>
+</div>
+<div class="card">
+<h3>🌻 Bài 2: Vẽ bông hoa</h3>
+<p>1. Vẽ một hình tròn ở giữa.</p>
+<p>2. Vẽ các cánh hoa xung quanh.</p>
+<p>3. Vẽ thân và lá.</p>
+<p>4. Tô màu theo ý thích!</p>
+</div>
+</section>
+</main>
+<script>
+let current='#ff595e',history=[];
+const colors=['#ff595e','#ffca3a','#8ac926','#1982c4','#6a4c93','#ff924c','#f15bb5','#00bbf9','#ffffff','#333333'];
+const palette=document.getElementById('palette');
+colors.forEach(c=>{
+let b=document.createElement('button');
+b.className='color';b.style.background=c;
+b.onclick=()=>current=c;palette.appendChild(b);
+});
+document.querySelectorAll('#picture path,#picture circle,#picture rect,#picture ellipse').forEach(el=>{
+el.onclick=()=>{
+history.push({el:el,fill:el.getAttribute('fill')});
+el.setAttribute('fill',current);
+document.getElementById('message').textContent='Giỏi quá! ⭐';
+};
+});
+function undo(){
+let x=history.pop();if(x)x.el.setAttribute('fill',x.fill);
+}
+function clearPicture(){
+document.querySelectorAll('#picture path,#picture circle,#picture rect,#picture ellipse').forEach(el=>el.setAttribute('fill','white'));
+history=[];
+}
+function savePicture(){
+let data=new XMLSerializer().serializeToString(document.getElementById('picture'));
+let list=JSON.parse(localStorage.getItem('drawings')||'[]');
+list.push(data);localStorage.setItem('drawings',JSON.stringify(list));
+alert('Đã lưu tranh của bé!');
+}
+function show(id){
+['home','gallery','learn'].forEach(x=>document.getElementById(x).hidden=x!==id);
+if(id==='gallery'){
+let list=JSON.parse(localStorage.getItem('drawings')||'[]');
+document.getElementById('saved').innerHTML=list.map((x,i)=>'<div class="card">Tranh '+(i+1)+'<br><button onclick="view('+i+')">Xem tranh</button></div>').join('');
+}
+}
+function view(i){
+let list=JSON.parse(localStorage.getItem('drawings')||'[]');
+if(list[i]){document.getElementById('picture').outerHTML=list[i].replace('<svg','<svg id="picture"');show('home');}
+}
+</script>
+</body>
+</html>
