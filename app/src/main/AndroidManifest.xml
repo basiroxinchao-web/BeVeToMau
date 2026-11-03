@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
-        android:allowBackup="true"
-        android:label="Siro tô màu"
+    android:allowBackup="true"
+    android:icon="@drawable/siro_icon"
+    android:roundIcon="@drawable/siro_icon"
+    android:label="Siro tô màu"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:usesCleartextTraffic="false">
 
