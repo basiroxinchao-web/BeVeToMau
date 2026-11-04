@@ -5,7 +5,7 @@
     android:allowBackup="true"
     android:icon="@drawable/siro_icon"
     android:roundIcon="@drawable/siro_icon"
-    android:label="Siro tô màu"
+    android:label="Thế giới nhỏ của Siro"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:usesCleartextTraffic="false">
 
