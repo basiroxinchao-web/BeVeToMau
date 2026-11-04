@@ -23,7 +23,7 @@ h2{margin:0 0 8px;color:#7953c6;font-size:clamp(22px,4vw,32px)}p{color:#6d6680;l
 <div id="modal"><div class="box"><div id="emoji" style="font-size:42px">🌈</div><h2 id="title"></h2><p id="desc"></p><p style="font-size:12px;color:#9b93a8">Đây là khung điều hướng ban đầu. Chức năng chi tiết sẽ được triển khai và kiểm tra theo từng khu vực.</p><button class="close" onclick="closeModule()">Quay lại</button></div></div>
 <script>
 const names=["Trang chủ", "Tô màu", "Vẽ", "Chữ cái", "Học Toán", "Tìm điểm khác nhau", "Nối hình", "Thay đồ công chúa", "Đàn", "Xem video", "Cài đặt"],descs=["Đây là màn hình chính của Thế giới nhỏ của Siro.", "Chọn tranh, tô màu bằng ngón tay, hoàn tác và lưu tác phẩm.", "Vẽ tự do với bảng màu, nét vẽ và công cụ tẩy.", "Học chữ cái tiếng Việt qua hình ảnh và âm thanh.", "Luyện đếm, nhận biết số và phép tính đơn giản.", "Quan sát hai hình và tìm những chi tiết khác nhau.", "Nối các điểm theo thứ tự để hoàn thành hình.", "Phối trang phục, kiểu tóc và phụ kiện cho công chúa.", "Chạm phím đàn để nghe nốt nhạc và giai điệu.", "Khu video dành cho bé; nguồn video trực tuyến sẽ do phụ huynh lựa chọn.", "Cài đặt âm thanh, chế độ sử dụng và tùy chọn phụ huynh."],emojis=["🏡","🎨","✏️","🔤","🔢","🔎","🧩","👑","🎹","▶️","⚙️"];
-function openModule(i){if(i===1){showPaint();return;}document.getElementById('emoji').textContent=emojis[i];document.getElementById('title').textContent=names[i];document.getElementById('desc').textContent=descs[i];document.getElementById('modal').style.display='flex'}
+function openModule(i){if(i===1){showPaint();return;}if(i===2){showDraw();return;}document.getElementById('emoji').textContent=emojis[i];document.getElementById('title').textContent=names[i];document.getElementById('desc').textContent=descs[i];document.getElementById('modal').style.display='flex'}
 function closeModule(){document.getElementById('modal').style.display='none'}
 function updateNet(){document.getElementById('net').textContent=navigator.onLine?'● ONLINE':'● OFFLINE';document.getElementById('net').style.color=navigator.onLine?'#198754':'#a55b21'}
 window.addEventListener('online',updateNet);window.addEventListener('offline',updateNet);updateNet();
@@ -78,6 +78,62 @@ window.addEventListener('online',updateNet);window.addEventListener('offline',up
  window.closePaint=()=>{document.getElementById('paintScreen').style.display='none'};
  window.showPaint=()=>{document.getElementById('modal').style.display='none';document.getElementById('paintScreen').style.display='flex'};
  drawScene();
+})();
+</script>
+
+
+<style>
+#drawScreen{display:none;position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;z-index:30;background:linear-gradient(135deg,#d7f7ff,#ffe5f2);padding:clamp(7px,1.4vw,15px);overflow:hidden;color:#563b7a;flex-direction:column;gap:8px}
+#drawScreen .drawTop{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto}
+#drawScreen h2{font-size:clamp(17px,2.5vw,27px);margin:0;color:#7045b5}
+#drawScreen button{border:0;border-radius:13px;padding:clamp(7px,1vw,11px) clamp(9px,1.3vw,15px);font-weight:800;background:#fff;color:#684b98;box-shadow:0 2px 5px #74539a33;white-space:nowrap;font-size:clamp(11px,1.5vw,15px)}
+#drawScreen .drawTools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex:0 0 auto}
+#drawScreen .drawColor{width:clamp(24px,3.2vw,34px);height:clamp(24px,3.2vw,34px);padding:0;border:3px solid white;border-radius:50%;min-width:0}
+#drawScreen .drawColor.active{outline:3px solid #7045b5}
+#drawScreen .drawArea{flex:1;min-height:0;display:flex;background:#ffffffd9;border-radius:18px;padding:6px;overflow:hidden;box-shadow:0 4px 16px #7653a522}
+#drawCanvas{width:100%;height:100%;background:#fff;border-radius:12px;touch-action:none;display:block;cursor:crosshair}
+#drawScreen button.activeTool{background:#7045b5;color:#fff}
+@media(orientation:portrait){#drawScreen{width:100dvh;height:100vw;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%) rotate(90deg)}}
+</style>
+<div id="drawScreen">
+ <div class="drawTop"><h2>✏️ Góc sáng tạo – Bé tập vẽ</h2><button onclick="closeDraw()">↩ Quay lại</button></div>
+ <div class="drawTools"><b>Màu:</b>
+  <button class="drawColor active" style="background:#222222" data-draw-color="#222222" aria-label="Đen"></button>
+  <button class="drawColor" style="background:#ef476f" data-draw-color="#ef476f" aria-label="Hồng"></button>
+  <button class="drawColor" style="background:#ff9f1c" data-draw-color="#ff9f1c" aria-label="Cam"></button>
+  <button class="drawColor" style="background:#ffd166" data-draw-color="#ffd166" aria-label="Vàng"></button>
+  <button class="drawColor" style="background:#06d6a0" data-draw-color="#06d6a0" aria-label="Xanh lá"></button>
+  <button class="drawColor" style="background:#118ab2" data-draw-color="#118ab2" aria-label="Xanh dương"></button>
+  <button class="drawColor" style="background:#9b5de5" data-draw-color="#9b5de5" aria-label="Tím"></button>
+  <button class="drawColor" style="background:#ffffff" data-draw-color="#ffffff" aria-label="Trắng"></button>
+  <label style="font-size:12px;font-weight:800">Nét <input id="drawSize" type="range" min="2" max="36" value="8" style="width:75px;vertical-align:middle"></label>
+  <button id="drawPen" class="activeTool" onclick="setDrawTool('pen')">🖌 Bút</button>
+  <button id="drawEraser" onclick="setDrawTool('eraser')">🧽 Tẩy</button>
+  <button onclick="undoDraw()">↶ Hoàn tác</button>
+  <button onclick="clearDraw()">🗑 Xóa hết</button>
+  <button onclick="saveDraw()">💾 Lưu PNG</button>
+ </div>
+ <div class="drawArea"><canvas id="drawCanvas" width="1600" height="900"></canvas></div>
+</div>
+<script>
+(()=>{
+ const canvas=document.getElementById('drawCanvas'),ctx=canvas.getContext('2d');
+ let color='#222222',tool='pen',size=8,down=false,last=null,history=[];
+ function blank(){ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height)}
+ function snapshot(){try{history.push(ctx.getImageData(0,0,canvas.width,canvas.height));if(history.length>12)history.shift()}catch(e){}}
+ function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+ canvas.addEventListener('pointerdown',e=>{e.preventDefault();snapshot();down=true;last=point(e);canvas.setPointerCapture(e.pointerId);ctx.beginPath();ctx.arc(last.x,last.y,(tool==='eraser'?size*2:size)/2,0,Math.PI*2);ctx.fillStyle=tool==='eraser'?'#fff':color;ctx.fill()});
+ canvas.addEventListener('pointermove',e=>{if(!down)return;e.preventDefault();const p=point(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.lineWidth=tool==='eraser'?size*2:size;ctx.strokeStyle=tool==='eraser'?'#fff':color;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();last=p});
+ ['pointerup','pointercancel','lostpointercapture'].forEach(n=>canvas.addEventListener(n,()=>down=false));
+ document.querySelectorAll('[data-draw-color]').forEach(b=>b.addEventListener('click',()=>{color=b.dataset.drawColor;document.querySelectorAll('[data-draw-color]').forEach(x=>x.classList.toggle('active',x===b));if(tool==='eraser')setDrawTool('pen')}));
+ document.getElementById('drawSize').addEventListener('input',e=>size=Number(e.target.value));
+ window.setDrawTool=t=>{tool=t;document.getElementById('drawPen').classList.toggle('activeTool',t==='pen');document.getElementById('drawEraser').classList.toggle('activeTool',t==='eraser')};
+ window.undoDraw=()=>{const prev=history.pop();if(prev)ctx.putImageData(prev,0,0)};
+ window.clearDraw=()=>{snapshot();blank()};
+ window.saveDraw=()=>{const a=document.createElement('a');a.download='tranh-sang-tao-cua-be.png';a.href=canvas.toDataURL('image/png');a.click()};
+ window.showDraw=()=>{document.getElementById('drawScreen').style.display='flex';document.getElementById('modal').style.display='none'};
+ window.closeDraw=()=>{document.getElementById('drawScreen').style.display='none'};
+ blank();
 })();
 </script>
 
