@@ -29,49 +29,55 @@ function updateNet(){document.getElementById('net').textContent=navigator.onLine
 window.addEventListener('online',updateNet);window.addEventListener('offline',updateNet);updateNet();
 </script>
 <style>
-#paintScreen{display:none;position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;z-index:20;background:linear-gradient(135deg,#c8f4ff,#ffe2f1);padding:10px;overflow:auto;color:#563b7a}
-#paintScreen .paintTop{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-#paintScreen h2{font-size:clamp(18px,3vw,28px);margin:0;color:#7045b5}
-#paintScreen button{border:0;border-radius:14px;padding:9px 13px;font-weight:800;background:#fff;color:#684b98;box-shadow:0 2px 5px #74539a33}
-#paintScreen .tools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:8px 0}
-#paintScreen .swatch{width:30px;height:30px;padding:0;border:3px solid white!important;border-radius:50%!important}
+#paintScreen{display:none;position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;z-index:20;background:linear-gradient(135deg,#c8f4ff,#ffe2f1);padding:clamp(7px,1.5vw,16px);overflow:hidden;color:#563b7a;display:none;flex-direction:column;gap:8px}
+#paintScreen .paintTop{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto}
+#paintScreen h2{font-size:clamp(17px,2.5vw,27px);margin:0;color:#7045b5}
+#paintScreen button{border:0;border-radius:14px;padding:clamp(7px,1vw,11px) clamp(9px,1.4vw,15px);font-weight:800;background:#fff;color:#684b98;box-shadow:0 2px 5px #74539a33;white-space:nowrap}
+#paintScreen .tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex:0 0 auto}
+#paintScreen .swatch{width:clamp(25px,3.5vw,34px);height:clamp(25px,3.5vw,34px);padding:0;border:3px solid white!important;border-radius:50%!important}
 #paintScreen .swatch.active{outline:3px solid #7045b5}
-#paintScreen .canvasWrap{height:calc(100% - 105px);min-height:220px;display:flex;align-items:center;justify-content:center;background:#ffffffbd;border-radius:20px;padding:8px}
-#paintCanvas{width:100%;height:100%;touch-action:none;background:white;border-radius:14px;max-width:100%;}
+#paintScreen .canvasWrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#ffffffbd;border-radius:20px;padding:7px;overflow:hidden}
+#paintCanvas{width:100%;height:100%;touch-action:none;background:white;border-radius:14px;max-width:100%;object-fit:contain}
+#paintScreen .gallery{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:0 0 auto}
+#paintScreen .gallery button{font-size:clamp(11px,1.5vw,14px)}
+#paintScreen button.selected{background:#7045b5;color:#fff}
+@media(orientation:portrait){#paintScreen{width:100dvh;height:100vw;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%) rotate(90deg)}}
 </style>
 <div id="paintScreen">
  <div class="paintTop"><h2>🎨 Bé tập tô màu</h2><button onclick="closePaint()">↩ Quay lại</button></div>
- <div class="tools"><span>Chọn màu:</span>
-  <button class="swatch active" style="background:#ef476f" data-color="#ef476f" aria-label="Đỏ hồng"></button>
-  <button class="swatch" style="background:#ffd166" data-color="#ffd166" aria-label="Vàng"></button>
-  <button class="swatch" style="background:#06d6a0" data-color="#06d6a0" aria-label="Xanh lá"></button>
-  <button class="swatch" style="background:#118ab2" data-color="#118ab2" aria-label="Xanh dương"></button>
-  <button class="swatch" style="background:#9b5de5" data-color="#9b5de5" aria-label="Tím"></button>
-  <button class="swatch" style="background:#222" data-color="#222222" aria-label="Đen"></button>
-  <button id="eraserBtn" onclick="setEraser()">🧽 Tẩy</button>
-  <button onclick="clearPaint()">🗑 Xóa hết</button>
-  <button onclick="savePaint()">💾 Lưu tranh</button>
+ <div class="gallery"><b>Chọn tranh:</b><button class="selected" data-scene="house">🏡 Ngôi nhà</button><button data-scene="cat">🐱 Mèo con</button><button data-scene="butterfly">🦋 Bướm</button><button data-scene="flower">🌼 Bông hoa</button></div>
+ <div class="tools"><b>Màu:</b>
+  <button class="swatch active" style="background:#ef476f" data-color="#ef476f" aria-label="Hồng"></button><button class="swatch" style="background:#ffd166" data-color="#ffd166" aria-label="Vàng"></button><button class="swatch" style="background:#06d6a0" data-color="#06d6a0" aria-label="Xanh lá"></button><button class="swatch" style="background:#118ab2" data-color="#118ab2" aria-label="Xanh dương"></button><button class="swatch" style="background:#9b5de5" data-color="#9b5de5" aria-label="Tím"></button><button class="swatch" style="background:#ff8c42" data-color="#ff8c42" aria-label="Cam"></button><button class="swatch" style="background:#8d5524" data-color="#8d5524" aria-label="Nâu"></button><button class="swatch" style="background:#222" data-color="#222222" aria-label="Đen"></button>
+  <button id="fillBtn" class="selected" onclick="setTool('fill')">🪣 Tô vùng</button><button id="brushBtn" onclick="setTool('brush')">🖌 Cọ</button><button id="eraserBtn" onclick="setTool('eraser')">🧽 Tẩy</button><button onclick="undoPaint()">↶ Hoàn tác</button><button onclick="clearPaint()">🗑 Làm lại</button><button onclick="savePaint()">💾 Lưu tranh</button>
  </div>
  <div class="canvasWrap"><canvas id="paintCanvas" width="1000" height="620"></canvas></div>
 </div>
 <script>
 (()=>{
- const canvas=document.getElementById('paintCanvas'),ctx=canvas.getContext('2d');let drawing=false,color='#ef476f',eraser=false,last=null;
- function base(){ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.lineWidth=12;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#333';
- // Hình mẫu: mặt trời, mây, ngôi nhà và cây
- ctx.beginPath();ctx.arc(820,120,65,0,Math.PI*2);ctx.stroke();
- ctx.beginPath();ctx.moveTo(110,170);ctx.bezierCurveTo(55,170,55,95,125,100);ctx.bezierCurveTo(145,35,245,50,255,112);ctx.bezierCurveTo(325,105,335,185,270,185);ctx.closePath();ctx.stroke();
- ctx.beginPath();ctx.moveTo(330,490);ctx.lineTo(330,290);ctx.lineTo(500,170);ctx.lineTo(670,290);ctx.lineTo(670,490);ctx.closePath();ctx.stroke();ctx.beginPath();ctx.rect(390,365,75,125);ctx.stroke();ctx.beginPath();ctx.rect(535,330,85,75);ctx.stroke();
- ctx.beginPath();ctx.moveTo(760,490);ctx.lineTo(760,310);ctx.stroke();ctx.beginPath();ctx.arc(760,260,85,0,Math.PI*2);ctx.stroke();
- ctx.font='bold 34px sans-serif';ctx.fillStyle='#777';ctx.fillText('Tô màu ngôi nhà vui vẻ!',330,570);
- }
- function pos(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
- canvas.addEventListener('pointerdown',e=>{drawing=true;last=pos(e);canvas.setPointerCapture(e.pointerId)});
- canvas.addEventListener('pointermove',e=>{if(!drawing)return;const q=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=eraser?'#ffffff':color;ctx.lineWidth=eraser?34:12;ctx.stroke();last=q});
+ const canvas=document.getElementById('paintCanvas'),ctx=canvas.getContext('2d',{willReadFrequently:true});
+ let color='#ef476f',tool='fill',drawing=false,last=null,scene='house',history=[];
+ const drawings={
+ house:`<path d="M190 330 L500 90 L810 330 V555 H190Z"/><path d="M390 555 V390 H500 V555 M590 390 H720 V485 H590Z"/><path d="M130 330 L500 45 L870 330"/><circle cx="790" cy="120" r="65"/><path d="M80 190 Q90 120 165 145 Q205 65 270 145 Q340 135 345 205Z"/><path d="M90 555 H900"/>`,
+ cat:`<path d="M300 250 L270 90 L420 180 Q500 145 580 180 L730 90 L700 250 Q780 360 700 470 Q620 560 500 540 Q380 560 300 470 Q220 360 300 250Z"/><path d="M390 330 Q420 290 450 330 M550 330 Q580 290 610 330"/><path d="M475 390 L500 410 L525 390 M500 410 Q470 450 440 420 M500 410 Q530 450 560 420"/><path d="M300 390 L150 360 M300 430 L150 450 M700 390 L850 360 M700 430 L850 450"/>`,
+ butterfly:`<path d="M490 300 Q250 30 150 180 Q80 350 450 390 Q170 560 300 590 Q450 600 500 390 Q550 600 700 590 Q830 560 550 390 Q920 350 850 180 Q750 30 510 300Z"/><path d="M500 250 Q450 330 500 500 Q550 330 500 250Z"/><path d="M485 250 Q390 120 350 100 M515 250 Q610 120 650 100"/>`,
+ flower:`<circle cx="500" cy="320" r="75"/><g><ellipse cx="500" cy="170" rx="65" ry="115"/><ellipse cx="500" cy="470" rx="65" ry="115"/><ellipse cx="350" cy="320" rx="115" ry="65"/><ellipse cx="650" cy="320" rx="115" ry="65"/><ellipse cx="394" cy="214" rx="65" ry="115" transform="rotate(-45 394 214)"/><ellipse cx="606" cy="214" rx="65" ry="115" transform="rotate(45 606 214)"/><ellipse cx="394" cy="426" rx="65" ry="115" transform="rotate(45 394 426)"/><ellipse cx="606" cy="426" rx="65" ry="115" transform="rotate(-45 606 426)"/></g><path d="M500 395 V590 M500 500 Q390 440 350 520 Q420 575 500 540 M500 530 Q600 450 660 520 Q590 590 500 570"/>`
+ };
+ function drawScene(){ctx.fillStyle='#fff';ctx.fillRect(0,0,1000,620);ctx.save();ctx.translate(0,0);ctx.strokeStyle='#333';ctx.lineWidth=13;ctx.lineCap='round';ctx.lineJoin='round';ctx.fillStyle='#fff';ctx.beginPath();const svg=new DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620">${drawings[scene]}</svg>`,'image/svg+xml');for(const el of svg.documentElement.children){const d=el.getAttribute('d');if(d){const path=new Path2D(d);ctx.stroke(path)}}ctx.restore();history=[];}
+ function saveHistory(){try{history.push(ctx.getImageData(0,0,canvas.width,canvas.height));if(history.length>8)history.shift()}catch(e){}}
+ function colorPixel(x,y){const w=canvas.width,h=canvas.height;if(x<0||y<0||x>=w||y>=h)return;const img=ctx.getImageData(0,0,w,h),d=img.data,idx=(Math.floor(y)*w+Math.floor(x))*4;const target=[d[idx],d[idx+1],d[idx+2],d[idx+3]],hex=color.replace('#',''),fill=[parseInt(hex.slice(0,2),16),parseInt(hex.slice(2,4),16),parseInt(hex.slice(4,6),16),255];if(target[3]<10||Math.abs(target[0]-fill[0])+Math.abs(target[1]-fill[1])+Math.abs(target[2]-fill[2])<25)return;const match=(i)=>Math.abs(d[i]-target[0])<24&&Math.abs(d[i+1]-target[1])<24&&Math.abs(d[i+2]-target[2])<24&&Math.abs(d[i+3]-target[3])<24;const stack=[idx],seen=new Uint8Array(w*h);let count=0;while(stack.length&&count<350000){const i=stack.pop(),p=i/4;if(seen[p]||!match(i))continue;seen[p]=1;d[i]=fill[0];d[i+1]=fill[1];d[i+2]=fill[2];d[i+3]=255;count++;const px=p%w,py=Math.floor(p/w);if(px>0)stack.push(i-4);if(px<w-1)stack.push(i+4);if(py>0)stack.push(i-w*4);if(py<h-1)stack.push(i+w*4)}ctx.putImageData(img,0,0)}
+ function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+ canvas.addEventListener('pointerdown',e=>{const p=pos(e);if(tool==='fill'){saveHistory();colorPixel(p.x,p.y);return}drawing=true;last=p;saveHistory();canvas.setPointerCapture(e.pointerId)});
+ canvas.addEventListener('pointermove',e=>{if(!drawing)return;const p=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.strokeStyle=tool==='eraser'?'#fff':color;ctx.lineWidth=tool==='eraser'?38:12;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();last=p});
  ['pointerup','pointercancel','pointerleave'].forEach(n=>canvas.addEventListener(n,()=>drawing=false));
- document.querySelectorAll('#paintScreen .swatch').forEach(b=>b.addEventListener('click',()=>{color=b.dataset.color;eraser=false;document.querySelectorAll('#paintScreen .swatch').forEach(x=>x.classList.remove('active'));b.classList.add('active')}));
- window.setEraser=()=>{eraser=true;document.querySelectorAll('#paintScreen .swatch').forEach(x=>x.classList.remove('active'))};
- window.clearPaint=base;window.savePaint=()=>{const a=document.createElement('a');a.download='tranh-cua-be.png';a.href=canvas.toDataURL('image/png');a.click()};window.closePaint=()=>{document.getElementById('paintScreen').style.display='none'};window.showPaint=()=>{document.getElementById('modal').style.display='none';document.getElementById('paintScreen').style.display='block'};base();
+ document.querySelectorAll('#paintScreen .swatch').forEach(b=>b.addEventListener('click',()=>{color=b.dataset.color;document.querySelectorAll('#paintScreen .swatch').forEach(x=>x.classList.remove('active'));b.classList.add('active')}));
+ document.querySelectorAll('[data-scene]').forEach(b=>b.addEventListener('click',()=>{scene=b.dataset.scene;document.querySelectorAll('[data-scene]').forEach(x=>x.classList.toggle('selected',x===b));drawScene()}));
+ window.setTool=t=>{tool=t;['fillBtn','brushBtn','eraserBtn'].forEach(id=>document.getElementById(id).classList.toggle('selected',id===({fill:'fillBtn',brush:'brushBtn',eraser:'eraserBtn'}[t])))};
+ window.undoPaint=()=>{const prev=history.pop();if(prev)ctx.putImageData(prev,0,0)};
+ window.clearPaint=drawScene;
+ window.savePaint=()=>{const a=document.createElement('a');a.download='tranh-cua-be-'+scene+'.png';a.href=canvas.toDataURL('image/png');a.click()};
+ window.closePaint=()=>{document.getElementById('paintScreen').style.display='none'};
+ window.showPaint=()=>{document.getElementById('modal').style.display='none';document.getElementById('paintScreen').style.display='flex'};
+ drawScene();
 })();
 </script>
 
