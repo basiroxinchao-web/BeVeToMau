@@ -23,7 +23,7 @@ h2{margin:0 0 8px;color:#7953c6;font-size:clamp(22px,4vw,32px)}p{color:#6d6680;l
 <div id="modal"><div class="box"><div id="emoji" style="font-size:42px">🌈</div><h2 id="title"></h2><p id="desc"></p><p style="font-size:12px;color:#9b93a8">Đây là khung điều hướng ban đầu. Chức năng chi tiết sẽ được triển khai và kiểm tra theo từng khu vực.</p><button class="close" onclick="closeModule()">Quay lại</button></div></div>
 <script>
 const names=["Trang chủ", "Tô màu", "Vẽ", "Chữ cái", "Học Toán", "Tìm điểm khác nhau", "Nối hình", "Thay đồ công chúa", "Đàn", "Xem video", "Cài đặt"],descs=["Đây là màn hình chính của Thế giới nhỏ của Siro.", "Chọn tranh, tô màu bằng ngón tay, hoàn tác và lưu tác phẩm.", "Vẽ tự do với bảng màu, nét vẽ và công cụ tẩy.", "Học chữ cái tiếng Việt qua hình ảnh và âm thanh.", "Luyện đếm, nhận biết số và phép tính đơn giản.", "Quan sát hai hình và tìm những chi tiết khác nhau.", "Nối các điểm theo thứ tự để hoàn thành hình.", "Phối trang phục, kiểu tóc và phụ kiện cho công chúa.", "Chạm phím đàn để nghe nốt nhạc và giai điệu.", "Khu video dành cho bé; nguồn video trực tuyến sẽ do phụ huynh lựa chọn.", "Cài đặt âm thanh, chế độ sử dụng và tùy chọn phụ huynh."],emojis=["🏡","🎨","✏️","🔤","🔢","🔎","🧩","👑","🎹","▶️","⚙️"];
-function openModule(i){if(i===1){showPaint();return;}if(i===2){showDraw();return;}document.getElementById('emoji').textContent=emojis[i];document.getElementById('title').textContent=names[i];document.getElementById('desc').textContent=descs[i];document.getElementById('modal').style.display='flex'}
+function openModule(i){if(i===1){showPaint();return;}if(i===2){showDraw();return;}if(i===3){showAlphabet();return;}document.getElementById('emoji').textContent=emojis[i];document.getElementById('title').textContent=names[i];document.getElementById('desc').textContent=descs[i];document.getElementById('modal').style.display='flex'}
 function closeModule(){document.getElementById('modal').style.display='none'}
 function updateNet(){document.getElementById('net').textContent=navigator.onLine?'● ONLINE':'● OFFLINE';document.getElementById('net').style.color=navigator.onLine?'#198754':'#a55b21'}
 window.addEventListener('online',updateNet);window.addEventListener('offline',updateNet);updateNet();
@@ -134,6 +134,58 @@ window.addEventListener('online',updateNet);window.addEventListener('offline',up
  window.showDraw=()=>{document.getElementById('drawScreen').style.display='flex';document.getElementById('modal').style.display='none'};
  window.closeDraw=()=>{document.getElementById('drawScreen').style.display='none'};
  blank();
+})();
+</script>
+
+
+<style>
+#alphaScreen{display:none;position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;z-index:40;background:linear-gradient(135deg,#dff8ff,#fff0d9 55%,#fce3f5);padding:clamp(8px,1.4vw,16px);overflow:hidden;color:#563b7a;flex-direction:column;gap:8px}
+#alphaScreen *{box-sizing:border-box}#alphaScreen .aTop{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:0 0 auto}#alphaScreen h2{margin:0;color:#7045b5;font-size:clamp(18px,2.5vw,28px)}
+#alphaScreen button{border:0;border-radius:14px;padding:clamp(7px,1vw,12px) clamp(10px,1.4vw,16px);font-weight:800;background:white;color:#684b98;box-shadow:0 2px 6px #74539a2b;font-size:clamp(11px,1.4vw,15px)}
+#alphaScreen .aTabs{display:flex;gap:6px;flex-wrap:wrap;flex:0 0 auto}#alphaScreen .aTabs button.active{background:#7955c7;color:white}
+#alphaScreen .aBody{flex:1;min-height:0;display:grid;grid-template-columns:minmax(180px,30%) 1fr;gap:10px}
+#alphaScreen .aCard{background:#ffffffdb;border:2px solid #fff;border-radius:20px;padding:clamp(9px,1.4vw,16px);box-shadow:0 5px 16px #73539a1c;min-height:0;overflow:auto}
+#alphaScreen .aBig{font-size:clamp(64px,13vw,130px);font-weight:950;line-height:1;color:#ff7c9f;text-align:center;text-shadow:0 4px 0 #ffd4df;margin:5px 0}
+#alphaScreen .aWord{text-align:center;font-size:clamp(16px,2.4vw,25px);font-weight:900;color:#6a54a0}
+#alphaScreen .aEmoji{text-align:center;font-size:clamp(38px,6vw,65px);margin:4px}
+#alphaScreen .aGrid{display:grid;grid-template-columns:repeat(8,minmax(34px,1fr));gap:6px}
+#alphaScreen .aLetter{padding:8px 2px!important;font-size:clamp(17px,2.3vw,25px)!important;border:2px solid #f1e8ff!important}
+#alphaScreen .aLetter.current{background:#ffe2ef!important;border-color:#f58bb5!important;color:#a33b78!important}
+#alphaScreen .aActions{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+#alphaScreen .aQuiz{font-size:clamp(16px,2.4vw,24px);font-weight:900;text-align:center;color:#634b9b;padding:12px}
+#alphaScreen .aChoices{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+#alphaScreen .aChoices button{font-size:clamp(25px,4vw,42px);padding:14px}
+#alphaScreen .aFeedback{text-align:center;font-weight:900;min-height:25px;margin-top:8px}
+#alphaScreen #traceCanvas{width:100%;height:min(40vh,260px);background:#fff;border:2px dashed #c8b4ed;border-radius:16px;touch-action:none;display:block}
+#alphaScreen .aHint{font-size:clamp(11px,1.4vw,14px);color:#786d8d;text-align:center}
+@media(orientation:portrait){#alphaScreen{width:100dvh;height:100vw;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%) rotate(90deg)}}
+@media(max-width:520px){#alphaScreen .aBody{grid-template-columns: minmax(120px,32%) 1fr}#alphaScreen .aGrid{grid-template-columns:repeat(5,minmax(28px,1fr))}}
+</style>
+<div id="alphaScreen">
+ <div class="aTop"><h2>🔤 Bé vui học chữ cái</h2><button onclick="closeAlphabet()">↩ Quay lại</button></div>
+ <div class="aTabs"><button id="tabLearn" class="active" onclick="alphaTab('learn')">📚 Học chữ</button><button id="tabTrace" onclick="alphaTab('trace')">✍️ Tập viết</button><button id="tabQuiz" onclick="alphaTab('quiz')">⭐ Trò chơi</button></div>
+ <div class="aBody">
+  <section class="aCard" id="alphaCurrent"><div class="aBig" id="alphaBig">A a</div><div class="aEmoji" id="alphaEmoji">🍌</div><div class="aWord" id="alphaWord">A – Áo</div><div class="aActions"><button onclick="speakLetter()">🔊 Nghe đọc</button><button onclick="prevLetter()">◀ Trước</button><button onclick="nextLetter()">Tiếp ▶</button></div></section>
+  <section class="aCard" id="alphaRight"><div id="alphaLearnPane"><p class="aHint">Chọn một chữ cái để học. Bảng chữ cái tiếng Việt gồm 29 chữ.</p><div class="aGrid" id="alphaGrid"></div></div>
+   <div id="alphaTracePane" style="display:none"><div class="aHint">Dùng ngón tay đồ theo chữ cái mờ trên màn hình.</div><canvas id="traceCanvas" width="900" height="430"></canvas><div class="aActions"><button onclick="clearTrace()">🧹 Xóa nét</button><button onclick="speakLetter()">🔊 Nghe đọc</button></div></div>
+   <div id="alphaQuizPane" style="display:none"><div class="aQuiz" id="quizQuestion">Tìm chữ cái: A</div><div class="aChoices" id="quizChoices"></div><div class="aFeedback" id="quizFeedback"></div><div class="aActions"><button onclick="newQuiz()">Câu tiếp theo ➜</button></div></div>
+  </section>
+ </div>
+ <div class="aHint">Bé học vui mỗi ngày cùng Siro 💖 · Có thể học chữ và tập viết khi không có Internet</div>
+</div>
+<script>
+(()=>{
+ const letters=[['A','a','Áo','👕'],['Ă','ă','Ăn','🍚'],['Â','â','Ấm','🫖'],['B','b','Bóng','⚽'],['C','c','Cá','🐟'],['D','d','Dê','🐐'],['Đ','đ','Đèn','💡'],['E','e','Em bé','👶'],['Ê','ê','Ếch','🐸'],['G','g','Gà','🐔'],['H','h','Hoa','🌼'],['I','i','Ít','☝️'],['K','k','Kem','🍦'],['L','l','Lá','🍃'],['M','m','Mèo','🐱'],['N','n','Nón','👒'],['O','o','Ong','🐝'],['Ô','ô','Ô tô','🚗'],['Ơ','ơ','Ớt','🌶️'],['P','p','Pin','🔋'],['Q','q','Quà','🎁'],['R','r','Rùa','🐢'],['S','s','Sao','⭐'],['T','t','Táo','🍎'],['U','u','Ủng','🥾'],['Ư','ư','Ước mơ','🌈'],['V','v','Voi','🐘'],['X','x','Xe','🚲'],['Y','y','Y tá','🧑‍⚕️']];
+ let idx=0,quizAnswer='';const $=id=>document.getElementById(id);
+ function render(){const x=letters[idx];$('alphaBig').textContent=x[0]+' '+x[1];$('alphaEmoji').textContent=x[3];$('alphaWord').textContent=x[0]+' – '+x[2];$('alphaGrid').innerHTML=letters.map((a,i)=>`<button class="aLetter ${i===idx?'current':''}" onclick="selectLetter(${i})">${a[0]}</button>`).join('');drawGuide()}
+ window.selectLetter=i=>{idx=i;render()};window.nextLetter=()=>{idx=(idx+1)%letters.length;render()};window.prevLetter=()=>{idx=(idx+letters.length-1)%letters.length;render()};
+ window.speakLetter=()=>{if(!('speechSynthesis'in window)){alert('Thiết bị chưa hỗ trợ đọc chữ.');return}speechSynthesis.cancel();const x=letters[idx];const u=new SpeechSynthesisUtterance(x[0]+'. '+x[2]);u.lang='vi-VN';u.rate=.78;speechSynthesis.speak(u)};
+ window.alphaTab=t=>{['learn','trace','quiz'].forEach(k=>{$('tab'+k[0].toUpperCase()+k.slice(1)).classList.toggle('active',k===t);$('alpha'+(k==='learn'?'Learn':k==='trace'?'Trace':'Quiz')+'Pane').style.display=k===t?'block':'none'});if(t==='quiz')newQuiz();if(t==='trace')drawGuide()};
+ window.closeAlphabet=()=>{$('alphaScreen').style.display='none';if('speechSynthesis'in window)speechSynthesis.cancel()};window.showAlphabet=()=>{$('modal').style.display='none';$('alphaScreen').style.display='flex';alphaTab('learn');render()};
+ const c=$('traceCanvas'),cx=c.getContext('2d');function drawGuide(){if(!c)return;cx.clearRect(0,0,c.width,c.height);cx.fillStyle='#fff';cx.fillRect(0,0,c.width,c.height);cx.font='bold 300px system-ui';cx.textAlign='center';cx.textBaseline='middle';cx.fillStyle='#eadff8';cx.fillText(letters[idx][0],450,220);cx.font='bold 300px system-ui';cx.fillText(letters[idx][1],690,220)}
+ let down=false,last=null;function point(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}c.addEventListener('pointerdown',e=>{down=true;last=point(e);c.setPointerCapture(e.pointerId)});c.addEventListener('pointermove',e=>{if(!down)return;const p=point(e);cx.beginPath();cx.moveTo(last.x,last.y);cx.lineTo(p.x,p.y);cx.strokeStyle='#ff6097';cx.lineWidth=15;cx.lineCap='round';cx.lineJoin='round';cx.stroke();last=p});['pointerup','pointercancel','lostpointercapture'].forEach(n=>c.addEventListener(n,()=>down=false));window.clearTrace=drawGuide;
+ window.newQuiz=()=>{const target=letters[Math.floor(Math.random()*letters.length)];quizAnswer=target[0];$('quizQuestion').textContent='🔎 Hãy chọn chữ cái: '+target[0];$('quizFeedback').textContent='';const opts=[target];while(opts.length<3){const a=letters[Math.floor(Math.random()*letters.length)];if(!opts.includes(a))opts.push(a)}opts.sort(()=>Math.random()-.5);$('quizChoices').innerHTML=opts.map(a=>`<button onclick="answerQuiz('${a[0]}')">${a[0]}</button>`).join('')};window.answerQuiz=a=>{$('quizFeedback').textContent=a===quizAnswer?'🎉 Chính xác! Bé giỏi quá!':'💗 Chưa đúng, bé thử lại nhé!';$('quizFeedback').style.color=a===quizAnswer?'#159b68':'#d65b86';if(a===quizAnswer&&'speechSynthesis'in window){const u=new SpeechSynthesisUtterance('Giỏi lắm!');u.lang='vi-VN';speechSynthesis.speak(u)}};
+ render();
 })();
 </script>
 
