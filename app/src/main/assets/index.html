@@ -23,7 +23,7 @@ h2{margin:0 0 8px;color:#7953c6;font-size:clamp(22px,4vw,32px)}p{color:#6d6680;l
 <div id="modal"><div class="box"><div id="emoji" style="font-size:42px">🌈</div><h2 id="title"></h2><p id="desc"></p><p style="font-size:12px;color:#9b93a8">Đây là khung điều hướng ban đầu. Chức năng chi tiết sẽ được triển khai và kiểm tra theo từng khu vực.</p><button class="close" onclick="closeModule()">Quay lại</button></div></div>
 <script>
 const names=["Trang chủ", "Tô màu", "Vẽ", "Chữ cái", "Học Toán", "Tìm điểm khác nhau", "Nối hình", "Thay đồ công chúa", "Đàn", "Xem video", "Cài đặt"],descs=["Đây là màn hình chính của Thế giới nhỏ của Siro.", "Chọn tranh, tô màu bằng ngón tay, hoàn tác và lưu tác phẩm.", "Vẽ tự do với bảng màu, nét vẽ và công cụ tẩy.", "Học chữ cái tiếng Việt qua hình ảnh và âm thanh.", "Luyện đếm, nhận biết số và phép tính đơn giản.", "Quan sát hai hình và tìm những chi tiết khác nhau.", "Nối các điểm theo thứ tự để hoàn thành hình.", "Phối trang phục, kiểu tóc và phụ kiện cho công chúa.", "Chạm phím đàn để nghe nốt nhạc và giai điệu.", "Khu video dành cho bé; nguồn video trực tuyến sẽ do phụ huynh lựa chọn.", "Cài đặt âm thanh, chế độ sử dụng và tùy chọn phụ huynh."],emojis=["🏡","🎨","✏️","🔤","🔢","🔎","🧩","👑","🎹","▶️","⚙️"];
-function openModule(i){if(i===1){showPaint();return;}if(i===2){showDraw();return;}if(i===3){showAlphabet();return;}document.getElementById('emoji').textContent=emojis[i];document.getElementById('title').textContent=names[i];document.getElementById('desc').textContent=descs[i];document.getElementById('modal').style.display='flex'}
+function openModule(i){if(i===1){showPaint();return;}if(i===2){showDraw();return;}if(i===3){showAlphabet();return;}if(i===4){showMath();return;}document.getElementById('emoji').textContent=emojis[i];document.getElementById('title').textContent=names[i];document.getElementById('desc').textContent=descs[i];document.getElementById('modal').style.display='flex'}
 function closeModule(){document.getElementById('modal').style.display='none'}
 function updateNet(){document.getElementById('net').textContent=navigator.onLine?'● ONLINE':'● OFFLINE';document.getElementById('net').style.color=navigator.onLine?'#198754':'#a55b21'}
 window.addEventListener('online',updateNet);window.addEventListener('offline',updateNet);updateNet();
@@ -186,6 +186,112 @@ window.addEventListener('online',updateNet);window.addEventListener('offline',up
  let down=false,last=null;function point(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}c.addEventListener('pointerdown',e=>{down=true;last=point(e);c.setPointerCapture(e.pointerId)});c.addEventListener('pointermove',e=>{if(!down)return;const p=point(e);cx.beginPath();cx.moveTo(last.x,last.y);cx.lineTo(p.x,p.y);cx.strokeStyle='#ff6097';cx.lineWidth=15;cx.lineCap='round';cx.lineJoin='round';cx.stroke();last=p});['pointerup','pointercancel','lostpointercapture'].forEach(n=>c.addEventListener(n,()=>down=false));window.clearTrace=drawGuide;
  window.newQuiz=()=>{const target=letters[Math.floor(Math.random()*letters.length)];quizAnswer=target[0];$('quizQuestion').textContent='🔎 Hãy chọn chữ cái: '+target[0];$('quizFeedback').textContent='';const opts=[target];while(opts.length<3){const a=letters[Math.floor(Math.random()*letters.length)];if(!opts.includes(a))opts.push(a)}opts.sort(()=>Math.random()-.5);$('quizChoices').innerHTML=opts.map(a=>`<button onclick="answerQuiz('${a[0]}')">${a[0]}</button>`).join('')};window.answerQuiz=a=>{$('quizFeedback').textContent=a===quizAnswer?'🎉 Chính xác! Bé giỏi quá!':'💗 Chưa đúng, bé thử lại nhé!';$('quizFeedback').style.color=a===quizAnswer?'#159b68':'#d65b86';if(a===quizAnswer&&'speechSynthesis'in window){const u=new SpeechSynthesisUtterance('Giỏi lắm!');u.lang='vi-VN';speechSynthesis.speak(u)}};
  render();
+})();
+</script>
+
+
+<style>
+#mathScreen{display:none;position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;z-index:50;background:linear-gradient(135deg,#dff7ff,#fff0d7 55%,#fce4f4);padding:clamp(8px,1.4vw,16px);overflow:hidden;color:#563b7a;flex-direction:column;gap:9px}
+#mathScreen *{box-sizing:border-box}
+#mathScreen .mTop{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:0 0 auto}
+#mathScreen h2{margin:0;color:#7045b5;font-size:clamp(18px,2.5vw,28px)}
+#mathScreen button{border:0;border-radius:14px;padding:clamp(7px,1vw,12px) clamp(10px,1.4vw,16px);font-weight:850;background:#fff;color:#684b98;box-shadow:0 2px 6px #74539a2b;font-size:clamp(11px,1.4vw,15px)}
+#mathScreen button:active{transform:scale(.97)}
+#mathScreen .mTabs{display:flex;gap:7px;flex-wrap:wrap;flex:0 0 auto}
+#mathScreen .mTabs button.active{background:#7955c7;color:white}
+#mathScreen .mBody{display:grid;grid-template-columns:minmax(170px,30%) 1fr;gap:10px;flex:1;min-height:0}
+#mathScreen .mCard{background:#ffffffdf;border:2px solid white;border-radius:20px;padding:clamp(9px,1.4vw,16px);box-shadow:0 5px 16px #73539a1c;min-height:0;overflow:auto}
+#mathScreen .mBig{font-size:clamp(54px,10vw,100px);font-weight:950;line-height:1.1;text-align:center;color:#ff7c9f;text-shadow:0 4px 0 #ffd4df;margin:10px 0}
+#mathScreen .mSub{text-align:center;color:#6a54a0;font-size:clamp(14px,2vw,20px);font-weight:850}
+#mathScreen .mHint{text-align:center;color:#786d8d;font-size:clamp(11px,1.4vw,14px)}
+#mathScreen .mNumberGrid{display:grid;grid-template-columns:repeat(5,minmax(38px,1fr));gap:7px}
+#mathScreen .mNumberGrid button{font-size:clamp(19px,2.5vw,27px);padding:10px 3px;border:2px solid #f1e8ff}
+#mathScreen .mNumberGrid button.active{background:#ffe2ef;border-color:#f58bb5;color:#a33b78}
+#mathScreen .mQuestion{font-size:clamp(25px,4.5vw,48px);font-weight:950;color:#6a4db0;text-align:center;margin:8px 0}
+#mathScreen .mObjects{font-size:clamp(24px,4vw,42px);text-align:center;line-height:1.45;min-height:60px;overflow-wrap:anywhere}
+#mathScreen .mChoices{display:grid;grid-template-columns:repeat(4,minmax(54px,1fr));gap:9px;margin:12px auto;max-width:650px}
+#mathScreen .mChoices button{font-size:clamp(22px,3vw,34px);padding:clamp(12px,2vw,20px) 5px;background:#fff;border:2px solid #eee2ff}
+#mathScreen .mFeedback{text-align:center;font-weight:900;min-height:26px;font-size:clamp(13px,1.8vw,18px)}
+#mathScreen .mActions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+#mathScreen .mScore{text-align:center;font-weight:850;color:#7858b2}
+#mathScreen .mLevel{text-align:center;color:#927cae;font-size:12px}
+@media(orientation:portrait){#mathScreen{width:100dvh;height:100vw;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%) rotate(90deg)}}
+@media(max-width:520px){#mathScreen .mBody{grid-template-columns:minmax(115px,32%) 1fr}#mathScreen .mNumberGrid{grid-template-columns:repeat(3,minmax(30px,1fr))}#mathScreen .mChoices{grid-template-columns:repeat(2,minmax(55px,1fr))}}
+</style>
+<div id="mathScreen">
+ <div class="mTop"><h2>🔢 Bé vui học Toán</h2><button onclick="closeMath()">↩ Quay lại</button></div>
+ <div class="mTabs">
+  <button id="mTabCount" class="active" onclick="mathTab('count')">🔟 Làm quen số</button>
+  <button id="mTabAdd" onclick="mathTab('add')">➕ Phép cộng</button>
+  <button id="mTabSub" onclick="mathTab('sub')">➖ Phép trừ</button>
+  <button id="mTabQuiz" onclick="mathTab('quiz')">⭐ Thử tài</button>
+ </div>
+ <div class="mBody">
+  <section class="mCard">
+   <div class="mSub">Bé học các số từ 1 đến 10</div>
+   <div class="mBig" id="mCurrentNumber">1</div>
+   <div class="mSub" id="mNumberWord">Một</div>
+   <div class="mObjects" id="mNumberObjects">🍎</div>
+   <div class="mActions"><button onclick="prevMathNumber()">◀ Trước</button><button onclick="nextMathNumber()">Tiếp ▶</button></div>
+   <div class="mNumberGrid" id="mNumberGrid"></div>
+  </section>
+  <section class="mCard">
+   <div id="mCountPane">
+    <p class="mHint">Nhìn số lượng hình và đếm cùng Siro nhé!</p>
+    <div class="mQuestion" id="mCountQuestion">Có bao nhiêu quả táo?</div>
+    <div class="mObjects" id="mCountObjects">🍎 🍎 🍎</div>
+    <div class="mChoices" id="mCountChoices"></div>
+    <div class="mFeedback" id="mCountFeedback"></div>
+    <div class="mActions"><button onclick="newCountQuestion()">Câu khác ➜</button></div>
+   </div>
+   <div id="mAddPane" style="display:none">
+    <p class="mHint">Gộp hai nhóm đồ vật rồi tìm kết quả.</p>
+    <div class="mQuestion" id="mAddQuestion">2 + 1 = ?</div>
+    <div class="mObjects" id="mAddObjects">🍎🍎 + 🍎</div>
+    <div class="mChoices" id="mAddChoices"></div>
+    <div class="mFeedback" id="mAddFeedback"></div>
+    <div class="mActions"><button onclick="newMathQuestion('add')">Câu khác ➜</button></div>
+   </div>
+   <div id="mSubPane" style="display:none">
+    <p class="mHint">Có một nhóm đồ vật, bé lấy đi một phần nhé.</p>
+    <div class="mQuestion" id="mSubQuestion">5 − 2 = ?</div>
+    <div class="mObjects" id="mSubObjects">🍊🍊🍊🍊🍊 − 🍊🍊</div>
+    <div class="mChoices" id="mSubChoices"></div>
+    <div class="mFeedback" id="mSubFeedback"></div>
+    <div class="mActions"><button onclick="newMathQuestion('sub')">Câu khác ➜</button></div>
+   </div>
+   <div id="mQuizPane" style="display:none">
+    <p class="mHint">Trả lời đúng để tích lũy sao. Các câu hỏi hoạt động offline.</p>
+    <div class="mQuestion" id="mQuizQuestion">3 + 2 = ?</div>
+    <div class="mObjects" id="mQuizObjects">⭐ ⭐ ⭐ + ⭐ ⭐</div>
+    <div class="mChoices" id="mQuizChoices"></div>
+    <div class="mFeedback" id="mQuizFeedback"></div>
+    <div class="mScore" id="mScore">⭐ Điểm: 0</div>
+    <div class="mLevel" id="mLevel">Cấp độ dễ · Số trong phạm vi 10</div>
+    <div class="mActions"><button onclick="newMathQuestion('quiz')">Câu tiếp theo ➜</button></div>
+   </div>
+  </section>
+ </div>
+ <div class="mHint">Học đếm, cộng và trừ trong phạm vi 10 · Không cần Internet 💖</div>
+</div>
+<script>
+(()=>{
+ const $=id=>document.getElementById(id);
+ const words=['','Một','Hai','Ba','Bốn','Năm','Sáu','Bảy','Tám','Chín','Mười'];
+ const icons=['','🍎','🍊','⭐','🐠','🧸','🌼','🦋','🍓','🚗','🎈'];
+ let number=1,score=0,answers={count:0,add:0,sub:0,quiz:0};
+ const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+ function renderNumber(){ $('mCurrentNumber').textContent=number;$('mNumberWord').textContent=words[number];$('mNumberObjects').textContent=(icons[number]+' ').repeat(number).trim();$('mNumberGrid').innerHTML=Array.from({length:10},(_,i)=>`<button class="${i+1===number?'active':''}" onclick="selectMathNumber(${i+1})">${i+1}</button>`).join('');}
+ window.selectMathNumber=n=>{number=n;renderNumber()};window.nextMathNumber=()=>{number=number===10?1:number+1;renderNumber()};window.prevMathNumber=()=>{number=number===1?10:number-1;renderNumber()};
+ function choices(correct){const set=new Set([correct]);while(set.size<4){let n=rand(Math.max(0,correct-3),Math.min(10,correct+3));set.add(n)}return [...set].sort(()=>Math.random()-.5)}
+ function makeChoices(id,correct,kind){$(id).innerHTML=choices(correct).map(n=>`<button onclick="answerMath('${kind}',${n},${correct})">${n}</button>`).join('');}
+ window.answerMath=(kind,n,correct)=>{const feedbackId=kind==='count'?'mCountFeedback':kind==='add'?'mAddFeedback':kind==='sub'?'mSubFeedback':'mQuizFeedback';const ok=n===correct;$(feedbackId).textContent=ok?'🎉 Chính xác! Bé giỏi quá!':'💗 Chưa đúng, bé thử lại nhé!';$(feedbackId).style.color=ok?'#159b68':'#d65b86';if(ok&&kind==='quiz'){$('mScore').textContent='⭐ Điểm: '+(++score);}};
+ window.newCountQuestion=()=>{const n=rand(1,10),fruit=icons[rand(1,10)];$('mCountQuestion').textContent='Có bao nhiêu hình?';$('mCountObjects').textContent=(fruit+' ').repeat(n).trim();$('mCountFeedback').textContent='';makeChoices('mCountChoices',n,'count')};
+ window.newMathQuestion=kind=>{let a,b,result,sign,emoji=kind==='sub'?'🍊':'⭐';if(kind==='sub'){a=rand(2,10);b=rand(1,a);result=a-b;sign='−'}else{a=rand(0,8);b=rand(0,10-a);result=a+b;sign='+'}const prefix=kind==='quiz'?'mQuiz':kind==='add'?'mAdd':'mSub';$(prefix+'Question').textContent=`${a} ${sign} ${b} = ?`;$(prefix+'Objects').textContent=(emoji+' ').repeat(a).trim()+(kind==='sub'?' − ':' + ')+(emoji+' ').repeat(b).trim();$(prefix+'Feedback').textContent='';makeChoices(prefix+'Choices',result,kind);};
+ window.mathTab=t=>{['count','add','sub','quiz'].forEach(k=>{$('mTab'+k[0].toUpperCase()+k.slice(1)).classList.toggle('active',k===t);$('m'+k[0].toUpperCase()+k.slice(1)+'Pane').style.display=k===t?'block':'none'});if(t==='count')newCountQuestion();else newMathQuestion(t)};
+ window.showMath=()=>{$('modal').style.display='none';$('mathScreen').style.display='flex';mathTab('count');renderNumber()};
+ window.closeMath=()=>{$('mathScreen').style.display='none'};
+ renderNumber();newCountQuestion();newMathQuestion('add');newMathQuestion('sub');newMathQuestion('quiz');
 })();
 </script>
 
