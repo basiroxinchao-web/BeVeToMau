@@ -23,8 +23,56 @@ h2{margin:0 0 8px;color:#7953c6;font-size:clamp(22px,4vw,32px)}p{color:#6d6680;l
 <div id="modal"><div class="box"><div id="emoji" style="font-size:42px">🌈</div><h2 id="title"></h2><p id="desc"></p><p style="font-size:12px;color:#9b93a8">Đây là khung điều hướng ban đầu. Chức năng chi tiết sẽ được triển khai và kiểm tra theo từng khu vực.</p><button class="close" onclick="closeModule()">Quay lại</button></div></div>
 <script>
 const names=["Trang chủ", "Tô màu", "Vẽ", "Chữ cái", "Học Toán", "Tìm điểm khác nhau", "Nối hình", "Thay đồ công chúa", "Đàn", "Xem video", "Cài đặt"],descs=["Đây là màn hình chính của Thế giới nhỏ của Siro.", "Chọn tranh, tô màu bằng ngón tay, hoàn tác và lưu tác phẩm.", "Vẽ tự do với bảng màu, nét vẽ và công cụ tẩy.", "Học chữ cái tiếng Việt qua hình ảnh và âm thanh.", "Luyện đếm, nhận biết số và phép tính đơn giản.", "Quan sát hai hình và tìm những chi tiết khác nhau.", "Nối các điểm theo thứ tự để hoàn thành hình.", "Phối trang phục, kiểu tóc và phụ kiện cho công chúa.", "Chạm phím đàn để nghe nốt nhạc và giai điệu.", "Khu video dành cho bé; nguồn video trực tuyến sẽ do phụ huynh lựa chọn.", "Cài đặt âm thanh, chế độ sử dụng và tùy chọn phụ huynh."],emojis=["🏡","🎨","✏️","🔤","🔢","🔎","🧩","👑","🎹","▶️","⚙️"];
-function openModule(i){document.getElementById('emoji').textContent=emojis[i];document.getElementById('title').textContent=names[i];document.getElementById('desc').textContent=descs[i];document.getElementById('modal').style.display='flex'}
+function openModule(i){if(i===1){showPaint();return;}document.getElementById('emoji').textContent=emojis[i];document.getElementById('title').textContent=names[i];document.getElementById('desc').textContent=descs[i];document.getElementById('modal').style.display='flex'}
 function closeModule(){document.getElementById('modal').style.display='none'}
 function updateNet(){document.getElementById('net').textContent=navigator.onLine?'● ONLINE':'● OFFLINE';document.getElementById('net').style.color=navigator.onLine?'#198754':'#a55b21'}
 window.addEventListener('online',updateNet);window.addEventListener('offline',updateNet);updateNet();
-</script></body></html>
+</script>
+<style>
+#paintScreen{display:none;position:fixed;inset:0;z-index:20;background:linear-gradient(135deg,#c8f4ff,#ffe2f1);padding:10px;overflow:auto;color:#563b7a}
+#paintScreen .paintTop{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#paintScreen h2{font-size:clamp(18px,3vw,28px);margin:0;color:#7045b5}
+#paintScreen button{border:0;border-radius:14px;padding:9px 13px;font-weight:800;background:#fff;color:#684b98;box-shadow:0 2px 5px #74539a33}
+#paintScreen .tools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:8px 0}
+#paintScreen .swatch{width:30px;height:30px;padding:0;border:3px solid white!important;border-radius:50%!important}
+#paintScreen .swatch.active{outline:3px solid #7045b5}
+#paintScreen .canvasWrap{height:calc(100% - 105px);min-height:220px;display:flex;align-items:center;justify-content:center;background:#ffffffbd;border-radius:20px;padding:8px}
+#paintCanvas{width:100%;height:100%;touch-action:none;background:white;border-radius:14px;max-width:100%;}
+</style>
+<div id="paintScreen">
+ <div class="paintTop"><h2>🎨 Bé tập tô màu</h2><button onclick="closePaint()">↩ Quay lại</button></div>
+ <div class="tools"><span>Chọn màu:</span>
+  <button class="swatch active" style="background:#ef476f" data-color="#ef476f" aria-label="Đỏ hồng"></button>
+  <button class="swatch" style="background:#ffd166" data-color="#ffd166" aria-label="Vàng"></button>
+  <button class="swatch" style="background:#06d6a0" data-color="#06d6a0" aria-label="Xanh lá"></button>
+  <button class="swatch" style="background:#118ab2" data-color="#118ab2" aria-label="Xanh dương"></button>
+  <button class="swatch" style="background:#9b5de5" data-color="#9b5de5" aria-label="Tím"></button>
+  <button class="swatch" style="background:#222" data-color="#222222" aria-label="Đen"></button>
+  <button id="eraserBtn" onclick="setEraser()">🧽 Tẩy</button>
+  <button onclick="clearPaint()">🗑 Xóa hết</button>
+  <button onclick="savePaint()">💾 Lưu tranh</button>
+ </div>
+ <div class="canvasWrap"><canvas id="paintCanvas" width="1000" height="620"></canvas></div>
+</div>
+<script>
+(()=>{
+ const canvas=document.getElementById('paintCanvas'),ctx=canvas.getContext('2d');let drawing=false,color='#ef476f',eraser=false,last=null;
+ function base(){ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.lineWidth=12;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#333';
+ // Hình mẫu: mặt trời, mây, ngôi nhà và cây
+ ctx.beginPath();ctx.arc(820,120,65,0,Math.PI*2);ctx.stroke();
+ ctx.beginPath();ctx.moveTo(110,170);ctx.bezierCurveTo(55,170,55,95,125,100);ctx.bezierCurveTo(145,35,245,50,255,112);ctx.bezierCurveTo(325,105,335,185,270,185);ctx.closePath();ctx.stroke();
+ ctx.beginPath();ctx.moveTo(330,490);ctx.lineTo(330,290);ctx.lineTo(500,170);ctx.lineTo(670,290);ctx.lineTo(670,490);ctx.closePath();ctx.stroke();ctx.beginPath();ctx.rect(390,365,75,125);ctx.stroke();ctx.beginPath();ctx.rect(535,330,85,75);ctx.stroke();
+ ctx.beginPath();ctx.moveTo(760,490);ctx.lineTo(760,310);ctx.stroke();ctx.beginPath();ctx.arc(760,260,85,0,Math.PI*2);ctx.stroke();
+ ctx.font='bold 34px sans-serif';ctx.fillStyle='#777';ctx.fillText('Tô màu ngôi nhà vui vẻ!',330,570);
+ }
+ function pos(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+ canvas.addEventListener('pointerdown',e=>{drawing=true;last=pos(e);canvas.setPointerCapture(e.pointerId)});
+ canvas.addEventListener('pointermove',e=>{if(!drawing)return;const q=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=eraser?'#ffffff':color;ctx.lineWidth=eraser?34:12;ctx.stroke();last=q});
+ ['pointerup','pointercancel','pointerleave'].forEach(n=>canvas.addEventListener(n,()=>drawing=false));
+ document.querySelectorAll('#paintScreen .swatch').forEach(b=>b.addEventListener('click',()=>{color=b.dataset.color;eraser=false;document.querySelectorAll('#paintScreen .swatch').forEach(x=>x.classList.remove('active'));b.classList.add('active')}));
+ window.setEraser=()=>{eraser=true;document.querySelectorAll('#paintScreen .swatch').forEach(x=>x.classList.remove('active'))};
+ window.clearPaint=base;window.savePaint=()=>{const a=document.createElement('a');a.download='tranh-cua-be.png';a.href=canvas.toDataURL('image/png');a.click()};window.closePaint=()=>{document.getElementById('paintScreen').style.display='none'};window.showPaint=()=>{document.getElementById('modal').style.display='none';document.getElementById('paintScreen').style.display='block'};base();
+})();
+</script>
+
+</body></html>
